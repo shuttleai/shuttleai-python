@@ -44,8 +44,9 @@ class ClientBase(ABC):  # noqa: B024
         self.base_url = self._base_url
 
         self._logger = logging.getLogger(__name__)
-        self._default_chat_model = "shuttle-2.5"
-        self._default_image_model = "shuttle-2-diffusion"
+        self._default_chat_model = "shuttle-3.5"
+        self._default_image_model = "shuttle-jaguar"
+        self._default_video_model = "sora"
         self._default_audio_speech_model = "eleven_turbo_v2_5"
         self._version = __version__
 
@@ -153,6 +154,25 @@ class ClientBase(ABC):  # noqa: B024
         if model:
             request_data["model"] = model
         return self._make_request("image", request_data)
+
+    def _make_video_request(
+        self,
+        prompt: str,
+        model: str = "sora",
+        width: int = 480,
+        height: int = 480,
+        n_seconds: int = 5,
+        # n_variants: int = 1,
+    ) -> Dict[str, Any]:
+        request_data: Dict[str, Any] = {
+            "prompt": prompt,
+            "model": model,
+            "width": width,
+            "height": height,
+            "n_seconds": n_seconds,
+            # "n_variants": n_variants,
+        }
+        return self._make_request("video", request_data)
 
     def _make_audio_speech_request(
         self,

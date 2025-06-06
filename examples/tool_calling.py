@@ -42,7 +42,7 @@ history = [
 ]
 
 def main() -> None:
-    model = "shuttle-2.5"
+    model = "shuttle-3.5"
 
     client = ShuttleAI()
 

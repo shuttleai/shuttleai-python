@@ -59,6 +59,7 @@ class AsyncShuttleAI(ClientBase):
 
         self.chat: resources.AsyncChat = resources.AsyncChat(self)
         self.images: resources.AsyncImages = resources.AsyncImages(self)
+        self.video: resources.AsyncVideo = resources.AsyncVideo(self)
         self.audio: resources.AsyncAudio = resources.AsyncAudio(self)
         self.moderations: resources.AsyncModerations = resources.AsyncModerations(self)
         self.embeddings: resources.AsyncEmbeddings = resources.AsyncEmbeddings(self)

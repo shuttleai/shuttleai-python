@@ -6,7 +6,7 @@ from shuttleai.schemas.chat.completions import ChatMessage
 
 
 def main() -> None:
-    model = "shuttle-2.5"
+    model = "shuttle-3.5"
 
     client = ShuttleAI()
 

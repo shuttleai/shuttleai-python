@@ -12,11 +12,11 @@ from shuttleai import ShuttleAI
 from shuttleai.schemas.chat.completions import ChatMessage
 
 MODEL_LIST: List[str] = [
-    "shuttleai/shuttle-2.5",
+    "shuttleai/shuttle-3.5",
     "shuttle-2-turbo",
-    "shuttle-2.5",
-    "shuttleai/shuttle-2.5-mini",
-    "shuttle-2.5-mini",
+    "shuttle-3.5",
+    "shuttleai/shuttle-3.5-mini",
+    "shuttle-3.5-mini",
     "openai/gpt-4o-mini-2024-07-18",
     "gpt-4o-mini",
     "gpt-4o-mini-2024-07-18",
@@ -63,7 +63,7 @@ MODEL_LIST: List[str] = [
     "llama-3.1-8b",
     "meta-llama-3.1-8b-instruct",
 ]
-DEFAULT_MODEL: str = "shuttle-2.5"
+DEFAULT_MODEL: str = "shuttle-3.5"
 LOG_FORMAT: str = "%(asctime)s - %(levelname)s - %(message)s"
 # A dictionary of all commands and their arguments, used for tab completion.
 COMMAND_LIST: Dict[str, Union[Dict[str, Dict], Dict]] = {

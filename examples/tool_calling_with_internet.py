@@ -24,7 +24,7 @@ if __name__ == "__main__":
     messages = [{"role": "user", "content": prompt}]
     tools = [convert_function_json_to_tool_json(serialize_function_to_json(web_search))]
     trigger_response = shuttleai.chat.completions.create(
-        model="shuttle-2.5",
+        model="shuttle-3.5",
         messages=messages,
         tools=tools,
         tool_choice="auto"
@@ -47,7 +47,7 @@ if __name__ == "__main__":
                 })
 
         answer_response = shuttleai.chat.completions.create(
-            model="shuttle-2.5",
+            model="shuttle-3.5",
             messages=messages
         )
         answer_content = answer_response.first_choice.message.content

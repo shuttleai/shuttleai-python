@@ -7,7 +7,7 @@ from shuttleai import ShuttleAI
 def main() -> None:
     client = ShuttleAI()
 
-    model = "shuttle-2.5"
+    model = "shuttle-3.5"
 
     model_response = client.fetch_model(model)
 

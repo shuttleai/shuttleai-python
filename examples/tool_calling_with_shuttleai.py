@@ -58,7 +58,7 @@ tools = [
 shuttleai = ShuttleAI()
 
 response = shuttleai.chat.completions.create(
-    model="shuttle-2.5-mini", # our cheapest model, still very capable for high quality completions & tool calling!
+    model="shuttle-3.5-mini", # our cheapest model, still very capable for high quality completions & tool calling!
     messages=[{"role": "user", "content": "What's the weather like in San Francisco, Paris and Tokyo?"}],
     stream=False, # Set to True for streamed responses/tool calling
     tools=tools,

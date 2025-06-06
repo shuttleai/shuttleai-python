@@ -58,6 +58,7 @@ class ShuttleAI(ClientBase):
 
         self.chat: resources.Chat = resources.Chat(self)
         self.images: resources.Images = resources.Images(self)
+        self.video: resources.Video = resources.Video(self)
         self.audio: resources.Audio = resources.Audio(self)
         self.moderations: resources.Moderations = resources.Moderations(self)
         self.embeddings: resources.Embeddings = resources.Embeddings(self)
@@ -97,6 +98,44 @@ class ShuttleAI(ClientBase):
         json_response: Dict[str, Any] = orjson.loads(response.content)
 
         return json_response
+
+    def _raw_request(
+        self,
+        method: str,
+        json: Optional[Dict[str, Any]],
+        path: str,
+        accept_header: str = "application/json",
+    ) -> Dict[str, Any]:
+        json_bytes: Any | None = None
+        if json and len(json) > 0:
+            if "file" in json:
+                with open(json["file"], "rb") as f:
+                    json_bytes = {"file": f.read()}
+            else:
+                json_bytes = orjson.dumps(json)
+
+        headers = {
+            "Accept": accept_header,
+            "User-Agent": f"shuttleai-python/{self._version}",
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        if self.default_headers:
+            headers.update(self.default_headers)
+
+        url = f"{self._base_url}{path}"
+
+        self._logger.debug(f"Sending request: {method} {url} {json}")
+
+        response = self._http_client.request(
+            method,
+            url,
+            headers=headers,
+            json=json_bytes,
+        )
+
+        return self._check_response(response)
 
     def _request(
         self,
