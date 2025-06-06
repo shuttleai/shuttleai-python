@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Generic, Optional, Type, TypeVar, Union, cast
+from typing import Generic, Optional, Type, TypeVar, cast
 
 from shuttleai.client.base import ClientBase
 from shuttleai.resources.common import AsyncResource, SyncResource, T

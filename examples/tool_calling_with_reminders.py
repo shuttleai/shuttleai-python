@@ -32,7 +32,7 @@ if __name__ == "__main__":
         messages = [
             {"role": "system", "content": (
                 "You are a helpful assistant with the ability to set real-time reminders. "
-                "Never assume what to plug into function call arguments, always ask the user for the necessary information. "
+                "Never assume what to plug into function call arguments, always ask the user for the right information."
                 "After setting the reminder and receiving the tool role response, "
                 "tell the user their reminder has been set and ask them if they need anything else while they wait. "
                 "When not invoking these functions/tools, reply as normal. Be helpful and friendly."
