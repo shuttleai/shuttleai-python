@@ -27,8 +27,11 @@ class BaseModelCard(BaseModel):
     owned_by: str
     """The organization ID of the owner of the model."""
 
-    cost: int = 1
-    """The usage cost per request to this model."""
+    plan: str = "free"
+    """The minimum plan required to use the model."""
+
+    request_multiplier: float = 1.0
+    """The multiplier for request costs when using the model."""
 
     premium: bool = False
     """Whether the model requires premium permissions."""

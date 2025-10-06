@@ -26,7 +26,7 @@ def main() -> None:
             messages=[ChatMessage(role="user", content="what is 5 plus 3")],
         )
         print(chat_response.choices[0].message.content)
-        print(f"${chat_response.usage.total_charged}")
+        print(f"${chat_response.usage.total_tokens}")
     except ShuttleAIAPIException as e:
         print(str(e))
         print(e.headers)  # can find request ID here

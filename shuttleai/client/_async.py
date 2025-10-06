@@ -89,16 +89,16 @@ class AsyncShuttleAI(ClientBase):
         if response.status in {429, 500, 502, 503, 504}:
             raise ShuttleAIAPIStatusException.from_response(
                 response,
-                message=f"Status: {response.status}. Message: {await response.text()}",
+                message=(await response.text()),
             )
         elif 400 <= response.status < 500:
             raise ShuttleAIAPIException.from_response(
                 response,
-                message=f"Status: {response.status}. Message: {await response.text()}",
+                message=(await response.text()),
             )
         elif response.status >= 500:
             raise ShuttleAIException(
-                message=f"Status: {response.status}. Message: {await response.text()}",
+                message=(await response.text()),
             )
 
     async def _check_response(self, response: aiohttp.ClientResponse) -> Dict[str, Any]:

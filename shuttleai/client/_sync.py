@@ -73,20 +73,20 @@ class ShuttleAI(ClientBase):
         if response.status_code in {429, 500, 502, 503, 504}:
             raise ShuttleAIAPIStatusException.from_response(
                 response,
-                message=f"Status: {response.status_code}. Message: {response.text}",
+                message=response.text,
             )
         elif 400 <= response.status_code < 500:
             if response.stream:
                 response.read()
             raise ShuttleAIAPIException.from_response(
                 response,
-                message=f"Status: {response.status_code}. Message: {response.text}",
+                message=response.text,
             )
         elif response.status_code >= 500:
             if response.stream:
                 response.read()
             raise ShuttleAIException(
-                message=f"Status: {response.status_code}. Message: {response.text}",
+                message=response.text,
             )
 
     def _check_streaming_response(self, response: Response) -> None:

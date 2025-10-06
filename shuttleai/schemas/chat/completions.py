@@ -1,3 +1,4 @@
+import warnings
 from enum import Enum
 from typing import List, Optional, Union
 
@@ -136,7 +137,13 @@ class ChatCompletionResponse(BaseModel):
 
     @property
     def cost(self) -> float:
-        return self.usage.total_charged
+        warnings.warn(
+            "The 'cost' property is deprecated. Use 'usage.total_tokens' instead. " +
+            "See https://docs.shuttleai.com for details.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return self.usage.total_tokens
 
     # x_sai: Annotated[
     #     ShuttleAIMeta,
