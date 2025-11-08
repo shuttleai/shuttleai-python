@@ -1,23 +1,37 @@
+import types
+from typing import Any
+
 import httpx
+import orjson
+from httpx._content import ByteStream
 
 
 def _patch_httpx() -> None:
-    """
-    Monkey-patch httpx to accept direct bytes (orjson.dumps) directly.
-    Originally from
-    - https://github.com/encode/httpx/issues/717
-    But modified to be faster for ShuttleAI's specific use case.
-    Do not use this patch outside of ShuttleAI if you don't know what you're doing.
-    """
-    from httpx._content import Any, ByteStream
+    original_encode_json = httpx._content.encode_json
 
-    def encode_json(json: Any) -> tuple[dict[str, str], ByteStream]:
+    def new_encode_json(json: Any) -> tuple[dict[str, str], ByteStream]:
+        try:
+            body = orjson.dumps(json, option=orjson.OPT_NAIVE_UTC)
+        except orjson.JSONEncodeError:
+            return original_encode_json(json)
+
         return {
-            "Content-Length": str(len(json)),
             "Content-Type": "application/json",
-        }, ByteStream(json)
+            "Content-Length": str(len(body)),
+        }, ByteStream(body)
 
-    # This makes the above function look and act like the original.
-    encode_json.__globals__.update(httpx._content.__dict__)
-    encode_json.__module__ = httpx._content.__name__
-    httpx._content.encode_json = encode_json
+    httpx._content.encode_json = new_encode_json
+
+    original_json = httpx._models.Response.json
+
+    def new_json(self: httpx._models.Response, **kwargs: Any) -> Any:
+        try:
+            return orjson.loads(self.content, **kwargs)
+        except orjson.JSONDecodeError:
+            return original_json(self, **kwargs)
+
+    setattr(
+        httpx._models.Response,
+        "json",
+        types.MethodType(new_json, httpx._models.Response)
+    )

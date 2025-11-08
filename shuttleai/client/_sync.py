@@ -20,6 +20,7 @@ from shuttleai.schemas.models.models import (
     ListModelsResponse,
     ListVerboseModelsResponse,
     ProxyCard,
+    VerboseModelCard,
 )
 
 
@@ -214,11 +215,11 @@ class ShuttleAI(ClientBase):
             model_id (str): The ID of the model to fetch
 
         Returns:
-            BaseModelCard, None]: The model if it exists
+            VerboseModelCard, None]: The model if it exists
         """
         singleton_response = self._request("get", {}, f"/models/{model_id}")
         try:
-            return BaseModelCard(**next(singleton_response)["data"])
+            return VerboseModelCard(**next(singleton_response))
         except (pydantic_core.ValidationError, StopIteration) as e:
             raise ShuttleAIException("No response received") from e
 

@@ -30,15 +30,6 @@ class BaseModelCard(BaseModel):
     plan: str = "free"
     """The minimum plan required to use the model."""
 
-    request_multiplier: float = 1.0
-    """The multiplier for request costs when using the model."""
-
-    premium: bool = False
-    """Whether the model requires premium permissions."""
-
-    endpoint: Union[str, List[str]]
-    """The endpoint URL(s) for the model."""
-
 
 class VerboseModelCard(BaseModelCard):
     name: str
@@ -47,14 +38,20 @@ class VerboseModelCard(BaseModelCard):
     description: str
     """The description of the model."""
 
-    maintenance: Optional[bool] = None
-    """Whether the model is under maintenance. If true, the model is not available for use."""
+    type: str
+    """The type of the model (e.g chat.completions)."""
 
-    beta: Optional[bool] = None
-    """Whether the model is in beta. If true, the model may have unstable behavior and must be requested to use."""
+    modality: Optional[str]
+    """The modality of the model (e.g text,image->text)"""
 
-    capabilities: Optional[Capabilities] = None
-    """The capabilities of the model."""
+    request_multiplier: float = 1.0
+    """The multiplier for request costs when using the model."""
+
+    permission: Optional[dict] = {}
+    """The permissions for the model. TODO: write out types"""
+
+    active: bool = True
+    """The status of the model."""
 
 
 class ProxyCard(BaseModel):
