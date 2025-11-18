@@ -15,8 +15,9 @@ classifiers = [
 ]
 keywords = ["shuttleai", "ai", "gpt", "claude", "api", "free", "chatgpt", "gpt-4"]
 
-[tool.poetry-version-plugin]
-source = "init"
+[tool.poetry.requires-plugins]
+poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+
 
 [tool.ruff]
 select = ["E", "F", "W", "Q", "I"]
@@ -57,19 +58,19 @@ python = "^3.9"
 aiohttp = "^3.9.5"
 orjson = "^3.10.3"
 pydantic = "^2.7.3"
-httpx = ">= 0.25.2, < 1"
+httpx = ">= 0.28.1, < 1"
 python-dateutil = "^2.9.0.post0"
 matplotlib = "^3.9.0"
 pyreadline3 = "^3.4.1"
-aiofiles = "^23.2.1"
-types-aiofiles = "^23.2.0.20240403"
-poetry-version-plugin = "^0.2.0"
+aiofiles = "^25.0.0"
+types-aiofiles = "^25.1.0.20251011"
+poetry-dynamic-versioning = "^1.4.0"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.1.6"
+ruff = "^0.14.5"
 mypy = "^1.10.0"
-black = "^24.4.2"
-types-requests = "^2.31.0.10"
+black = "^25.11.0"
+types-requests = "^2.32.4.20250913"
 pyyaml = "^6.0.1"
 types-pyyaml = "^6.0.12.20240311"
 
@@ -79,6 +80,9 @@ clean = "etc.tools.clean:clean_all"
 key = "etc.tools.key:show_key"
 contr = "etc.tools.contributors:main"
 
+
+[tool.poetry-dynamic-versioning]
+enable = true
 [build-system]
-requires = ["poetry-core==1.8.1"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
