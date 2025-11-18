@@ -1,6 +1,10 @@
+[project]
+name = "shuttleai-python"
+dynamic = ["version"]
+
 [tool.poetry]
 name = "shuttleai"
-version = "0"
+version = "0.0.0"
 description = "Access Shuttle AI's API via an easy-to-use Python wrapper. Dashboard: https://shuttleai.com Discord: https://discord.gg/shuttleai"
 authors = ["Tristan Liu <tristan@shuttleai.app>", "Christian \"Thoth\" Heru <chris@shuttleai.app>"]
 maintainers = ["Christian \"Thoth\" Heru <chris@shuttleai.app>"]
@@ -14,10 +18,6 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 keywords = ["shuttleai", "ai", "gpt", "claude", "api", "free", "chatgpt", "gpt-4"]
-
-[tool.poetry.requires-plugins]
-poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
-
 
 [tool.ruff]
 select = ["E", "F", "W", "Q", "I"]
