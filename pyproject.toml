@@ -1,3 +1,7 @@
+[project]
+name = "shuttleai"
+dynamic = [ "version" ]
+
 [tool.poetry]
 name = "shuttleai"
 version = "0.0.0"
