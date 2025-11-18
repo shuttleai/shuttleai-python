@@ -65,7 +65,7 @@ def main() -> None:
     ax.set_title("shuttleai-python Contributors", fontsize=24, fontweight="bold", color="white", pad=20)
 
     client = httpx.Client()
-    for i, (username, avatar_url) in enumerate(zip(usernames, avatars)):
+    for i, (username, avatar_url) in enumerate(zip(usernames, avatars, strict=True)):
         avatar_path = os.path.join(avatars_cache_dir, f"{username}.png")
         if not os.path.exists(avatar_path):
             response = client.get(avatar_url, timeout=30, headers={"Accept": "image/*"})

@@ -3,8 +3,6 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel
 
-from shuttleai.schemas.models.capabilities import Capabilities
-
 
 class ProxyType(str, Enum):
     proxy = "proxy"

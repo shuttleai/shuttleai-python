@@ -27,8 +27,4 @@ def _patch_httpx() -> None:
         except orjson.JSONDecodeError:
             return original_json(self, **kwargs)
 
-    setattr(
-        httpx._models.Response,
-        "json",
-        types.MethodType(new_json, httpx._models.Response)
-    )
+    httpx._models.Response.json = types.MethodType(new_json, httpx._models.Response)
