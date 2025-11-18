@@ -1,14 +1,21 @@
 import logging
 import os
 from abc import ABC
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import orjson
 
 from shuttleai import __version__
 from shuttleai._types import TimeoutTypes
 from shuttleai.exceptions import ShuttleAIException
-from shuttleai.schemas.chat.completions import ChatMessage, Function, ToolChoice
+from shuttleai.schemas.chat.completions import (
+    ChatMessage,
+    ChatNamedToolChoice,
+    FunctionTool,
+    MCPTool,
+    ResponseFormat,
+    Tool,
+)
 
 
 class ClientBase(ABC):  # noqa: B024
@@ -87,28 +94,53 @@ class ClientBase(ABC):  # noqa: B024
             if v is not None
         }
 
-    def _parse_tools(self, tools: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        return [
-            {
-                "type": tool["type"],
-                "function": (
-                    tool["function"].model_dump(exclude_none=True)
-                    if isinstance(tool["function"], Function)
-                    else tool["function"]
-                ),
-            }
-            for tool in tools
-            if tool["type"] == "function"
-        ]
-
-    def _parse_tool_choice(self, tool_choice: Union[str, ToolChoice]) -> str:
-        return tool_choice.value if isinstance(tool_choice, ToolChoice) else tool_choice
-
     def _parse_messages(self, messages: List[Any]) -> List[Dict[str, Any]]:
-        return [
-            (message.model_dump(exclude_none=True) if isinstance(message, ChatMessage) else message)
-            for message in messages
-        ]
+        parsed = []
+        for message in messages:
+            if isinstance(message, ChatMessage):
+                msg = message.model_dump(mode="json", exclude_none=True)
+            else:
+                msg = message
+            if isinstance(msg.get("content"), list):
+                for part in msg["content"]:
+                    if part.get("type") == "image_url" and isinstance(part.get("image_url"), str):
+                        part["image_url"] = {"url": part["image_url"], "detail": "auto"}
+            parsed.append(msg)
+        return parsed
+
+    def _parse_tools(self, tools: List[Any]) -> List[Dict[str, Any]]:
+        parsed = []
+        for tool in tools:
+            if isinstance(tool, (FunctionTool, MCPTool)):
+                t = tool.model_dump(mode="json", exclude_none=True)
+            else:
+                t = tool
+            # For backward compat if flat function
+            if t.get("type") == "function" and "function" not in t:
+                func = {
+                    "name": t["name"],
+                    "description": t.get("description"),
+                    "parameters": t.get("parameters"),
+                }
+                t = {"type": "function", "function": func}
+            parsed.append(t)
+        return parsed
+
+    def _parse_tool_choice(self, tool_choice: Any) -> Any:
+        if isinstance(tool_choice, ChatNamedToolChoice):
+            return tool_choice.model_dump(mode="json", exclude_none=True)
+        elif isinstance(tool_choice, dict):
+            return tool_choice
+        elif isinstance(tool_choice, str):
+            return tool_choice
+        return None
+
+    def _parse_response_format(self, response_format: Any) -> Optional[Dict[str, Any]]:
+        if isinstance(response_format, ResponseFormat):
+            return response_format.model_dump(mode="json", exclude_none=True)
+        elif isinstance(response_format, dict):
+            return response_format
+        return None
 
     def _make_request(self, endpoint: str, request_data: Dict[str, Any]) -> Dict[str, Any]:
         if "model" not in request_data:
@@ -120,30 +152,39 @@ class ClientBase(ABC):  # noqa: B024
         self,
         messages: List[Any],
         model: Optional[str] = None,
-        image: Optional[str] = None,
-        internet: Optional[str] = None,
-        tools: Optional[List[Dict[str, Any]]] = None,
+        tools: Optional[List[Any]] = None,
+        tool_choice: Optional[Any] = None,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         top_p: Optional[float] = None,
+        frequency_penalty: Optional[float] = None,
+        presence_penalty: Optional[float] = None,
+        stop: Optional[Union[str, List[str]]] = None,
+        response_format: Optional[Any] = None,
+        reasoning_effort: Optional[Literal["none", "minimal", "low", "high"]] = None,
         stream: Optional[bool] = None,
-        tool_choice: Optional[Union[str, ToolChoice]] = None,
     ) -> Dict[str, Any]:
         request_data: Dict[str, Any] = {
             "messages": self._parse_messages(messages),
         }
         if model:
             request_data["model"] = model
-        if image:
-            request_data["image"] = image
-        if internet:
-            request_data["internet"] = internet
         if tools:
             request_data["tools"] = self._parse_tools(tools)
         if tool_choice:
             request_data["tool_choice"] = self._parse_tool_choice(tool_choice)
-        if stream:
+        if response_format:
+            request_data["response_format"] = self._parse_response_format(response_format)
+        if reasoning_effort:
+            request_data["reasoning_effort"] = reasoning_effort
+        if stream is not None:
             request_data["stream"] = stream
+        if stop is not None:
+            request_data["stop"] = stop
+        if frequency_penalty is not None:
+            request_data["frequency_penalty"] = frequency_penalty
+        if presence_penalty is not None:
+            request_data["presence_penalty"] = presence_penalty
         request_data.update(self._build_sampling_params(max_tokens, temperature, top_p))
         return self._make_request("chat", request_data)
 

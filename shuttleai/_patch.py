@@ -10,15 +10,12 @@ def _patch_httpx() -> None:
     original_encode_json = httpx._content.encode_json
 
     def new_encode_json(json: Any) -> tuple[dict[str, str], ByteStream]:
-        try:
-            body = orjson.dumps(json, option=orjson.OPT_NAIVE_UTC)
-        except orjson.JSONEncodeError:
+        if not isinstance(json, bytes):
             return original_encode_json(json)
-
         return {
             "Content-Type": "application/json",
-            "Content-Length": str(len(body)),
-        }, ByteStream(body)
+            "Content-Length": str(len(json)),
+        }, ByteStream(json)
 
     httpx._content.encode_json = new_encode_json
 

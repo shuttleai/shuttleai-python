@@ -1,21 +1,69 @@
-import warnings
 from enum import Enum
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from shuttleai.exceptions import ShuttleAIException
 from shuttleai.schemas.common import UsageInfo
 
 
-class Function(BaseModel):
-    name: str
-    description: str
-    parameters: dict
-
-
 class ToolType(str, Enum):
     function = "function"
+    mcp = "mcp"
+
+
+class ImageURL(BaseModel):
+    url: str
+    detail: Literal["auto", "low", "high"] = "auto"
+
+
+class ChatMessageContentPartText(BaseModel):
+    type: Literal["text"] = "text"
+    text: str
+
+
+class ChatMessageContentPartImage(BaseModel):
+    type: Literal["image_url"] = "image_url"
+    image_url: Union[str, ImageURL]
+
+    @field_validator("image_url", mode="before")
+    @classmethod
+    def validate_image_url(cls, v: Any) -> ImageURL:
+        if isinstance(v, str):
+            return ImageURL(url=v)
+        elif isinstance(v, ImageURL):
+            return v
+        raise ValueError("image_url must be a string or ImageURL instance")
+
+
+ChatMessageContentPart = Union[ChatMessageContentPartText, ChatMessageContentPartImage]
+
+
+class Function(BaseModel):
+    name: str
+    description: Optional[str] = None
+    parameters: Optional[Dict[str, Any]] = None
+
+
+class FunctionTool(BaseModel):
+    type: Literal["function"] = "function"
+    function: Function
+
+
+class MCPHeaders(BaseModel):
+    authorization: str
+
+
+class MCPTool(BaseModel):
+    type: Literal["mcp"] = "mcp"
+    server_label: str
+    server_url: str
+    allowed_tools: Optional[List[str]] = None
+    require_approval: Literal["always", "never"] = "always"
+    headers: Optional[MCPHeaders] = None
+
+
+Tool = Union[FunctionTool, MCPTool]
 
 
 class FunctionCall(BaseModel):
@@ -23,51 +71,42 @@ class FunctionCall(BaseModel):
     arguments: str
 
 
-class ContentPartType(str, Enum):
-    text = "text"
-    image_url = "image_url"
-
-
 class ToolCall(BaseModel):
     id: str = "call_null"
-    type: ToolType = ToolType.function
+    type: str
     function: FunctionCall
 
 
-class ToolChoice(str, Enum):
-    auto: str = "auto"
-    none: str = "none"
+class NamedFunction(BaseModel):
+    name: str
 
 
-class ChatMessageContentPartText(BaseModel):
-    type: ContentPartType = ContentPartType.text
-    text: str
-
-
-class ChatMessageContentPartImage(BaseModel):
-    type: ContentPartType = ContentPartType.image_url
-    image_url: str
+class ChatNamedToolChoice(BaseModel):
+    type: Literal["function"] = "function"
+    function: NamedFunction
 
 
 class ChatMessage(BaseModel):
     role: str
-    content: Optional[Union[str, List[Union[ChatMessageContentPartText, ChatMessageContentPartImage]]]] = None
+    content: Optional[Union[str, List[ChatMessageContentPart]]] = None
     name: Optional[str] = None
     tool_calls: Optional[List[ToolCall]] = None
-    # tool_call_id: Optional[str] = None
+    tool_call_id: Optional[str] = None
 
 
 class ChatResponseMessage(BaseModel):
     role: str = "assistant"
     content: Optional[str] = None
+    reasoning_content: Optional[str] = None
     name: Optional[str] = None
     tool_calls: Optional[List[ToolCall]] = None
-    # tool_call_id: Optional[str] = None
+    tool_call_id: Optional[str] = None
 
 
 class DeltaMessage(BaseModel):
     role: Optional[str] = None
     content: Optional[str] = None
+    reasoning_content: Optional[str] = None
     tool_calls: Optional[List[ToolCall]] = None
 
 
@@ -115,18 +154,6 @@ class ChatCompletionResponseChoice(BaseModel):
     finish_reason: Optional[FinishReason]
 
 
-# class ShuttleAIMeta(BaseModel):
-#     id: str
-#     """The ID of the request."""
-
-#     p: str
-#     """The ID of the provider that processed the request.
-
-#     The provider ID is semi-reliable, meaning upon VPS restarts, provider IDs may change;
-#     however, they are guaranteed to remain the same for the duration of the VPS uptime.
-#     (This can be useful for debugging/reporting purposes.)"""
-
-
 class ChatCompletionResponse(BaseModel):
     id: str
     object: str
@@ -136,52 +163,11 @@ class ChatCompletionResponse(BaseModel):
     usage: UsageInfo
 
     @property
-    def cost(self) -> float:
-        warnings.warn(
-            "The 'cost' property is deprecated. Use 'usage.total_tokens' instead. " +
-            "See https://docs.shuttleai.com for details.",
-            DeprecationWarning,
-            stacklevel=2
-        )
-        return self.usage.total_tokens
-
-    # x_sai: Annotated[
-    #     ShuttleAIMeta,
-    #     Field(
-    #         alias="x-sai",
-    #         alias_priority=1,
-    #         examples=[{"id": "req_123abc", "p": "p_123abc"}],
-    #     ),
-    # ]
-
-    # @property
-    # def xsai(self) -> ShuttleAIMeta:
-    #     return self.x_sai
-
-    # @property
-    # def meta(self) -> ShuttleAIMeta:
-    #     return self.x_sai
-
-    # @property
-    # def provider(self) -> str:
-    #     return self.x_sai.p
-
-    # @property
-    # def provider_id(self) -> str:
-    #     return self.x_sai.p
-
-    # @property
-    # def request_id(self) -> str:
-    #     return self.x_sai.id
-
-    @property
     def first_choice(self) -> ChatCompletionResponseChoice:
         return self.choices[0]
 
     def print(self) -> None:
         try:
-            # print(f"Request ID: {self.request_id}")
-            # print(f"Provider ID: {self.provider_id}")
             print(f"Model: {self.model}")
             print(f"Created: {self.created}")
             print(f"Usage: {self.usage}")
@@ -191,3 +177,7 @@ class ChatCompletionResponse(BaseModel):
                 print(f"Finish Reason: {choice.finish_reason}")
         except Exception as e:
             raise ShuttleAIException(f"Error printing response: {e}") from e
+
+
+class ResponseFormat(BaseModel):
+    type: Literal["text", "json_object"] = "text"
