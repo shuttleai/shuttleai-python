@@ -4,14 +4,25 @@ from typing import Callable, Literal, Type, get_type_hints
 
 
 def _get_type_name(t: Type) -> str:
-    """Gets the name of a type, handling some edge cases like Literal types
+    """Gets the name of a type, handling JSON Schema compatibility (e.g., str -> string)
 
     Args:
         t (Type): The type to get the name of
 
     Returns:
-        str: The name of the type
+        str: The JSON Schema compatible type name
     """
+    # Special case for common types to JSON Schema format
+    if t is str:
+        return "string"
+    if t is int:
+        return "integer"
+    if t is bool:
+        return "boolean"
+    if t is float:
+        return "number"
+
+    # Fallback to standard type name resolution
     if hasattr(t, "__name__"):
         return t.__name__
     if hasattr(t, "_name"):
