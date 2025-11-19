@@ -80,11 +80,11 @@ clean = "etc.tools.clean:clean_all"
 key = "etc.tools.key:show_key"
 contr = "etc.tools.contributors:main"
 
-[tool.poetry-dynamic-versioning]
-enable = true
-
 [tool.poetry.requires-plugins]
 poetry-dynamic-versioning = { version = "^1.3.0", extras = ["plugin"] }
+
+[tool.poetry-dynamic-versioning]
+enable = true
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
