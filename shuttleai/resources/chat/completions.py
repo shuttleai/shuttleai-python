@@ -24,7 +24,6 @@ from shuttleai.schemas.chat.completions import (
     FunctionTool,
     MCPTool,
     ResponseFormat,
-    Tool,
 )
 
 
