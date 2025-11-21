@@ -94,6 +94,13 @@ class ChatMessage(BaseModel):
     tool_call_id: Optional[str] = None
 
 
+class ChatMessageMCPApprovalResponse(BaseModel):
+    approve: bool
+    approval_request_id: str
+    reason: Optional[str] = None
+    type: Literal["mcp_approval_response"] = "mcp_approval_response"
+
+
 class ChatResponseMessage(BaseModel):
     role: str = "assistant"
     content: Optional[str] = None
@@ -110,15 +117,24 @@ class DeltaMessage(BaseModel):
     tool_calls: Optional[List[ToolCall]] = None
 
 
+class DeltaMCPApprovalRequestMessage(BaseModel):
+    id: str
+    name: str
+    arguments: str
+    server_label: str
+    type: Literal["mcp_approval_request"] = "mcp_approval_request"
+
+
 class FinishReason(str, Enum):
     stop = "stop"
     length = "length"
     tool_calls = "tool_calls"
+    mcp_approval_request = "mcp_approval_request"
 
 
 class ChatCompletionResponseStreamChoice(BaseModel):
     index: int
-    delta: DeltaMessage
+    delta: DeltaMessage | DeltaMCPApprovalRequestMessage
     finish_reason: Optional[FinishReason]
 
 

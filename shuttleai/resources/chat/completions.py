@@ -108,7 +108,7 @@ class SyncCompletions(SyncResource):
     @overload
     def create(
         self,
-        messages: Union[List[ChatMessage], List[Dict[str, Any]]],
+        messages: Union[List[ChatMessage], List[Dict[str, Any]], List[Any]],
         model: Optional[str] = None,
         # tools: Optional[List[Union[Tool, Dict[str, Any]]]] = None,
         tools: Optional[list[FunctionTool] | list[MCPTool] | list[dict[str, Any]]] = None,
@@ -127,7 +127,7 @@ class SyncCompletions(SyncResource):
     @overload
     def create(
         self,
-        messages: Union[List[ChatMessage], List[Dict[str, Any]]],
+        messages: Union[List[ChatMessage], List[Dict[str, Any]], List[Any]],
         model: Optional[str] = None,
         # tools: Optional[List[Union[Tool, Dict[str, Any]]]] = None,
         tools: Optional[list[FunctionTool] | list[MCPTool] | list[dict[str, Any]]] = None,
@@ -145,7 +145,7 @@ class SyncCompletions(SyncResource):
 
     def create(
         self,
-        messages: Union[List[ChatMessage], List[Dict[str, Any]]],
+        messages: Union[List[ChatMessage], List[Dict[str, Any]], List[Any]],
         model: Optional[str] = None,
         # tools: Optional[List[Union[Tool, Dict[str, Any]]]] = None,
         tools: Optional[list[FunctionTool] | list[MCPTool] | list[dict[str, Any]]] = None,

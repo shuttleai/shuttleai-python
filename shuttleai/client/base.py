@@ -10,6 +10,8 @@ from shuttleai._types import TimeoutTypes
 from shuttleai.exceptions import ShuttleAIException
 from shuttleai.schemas.chat.completions import (
     ChatMessage,
+    ChatMessageMCPApprovalResponse,
+    DeltaMCPApprovalRequestMessage,
     ChatNamedToolChoice,
     FunctionTool,
     MCPTool,
@@ -97,6 +99,11 @@ class ClientBase(ABC):  # noqa: B024
         parsed = []
         for message in messages:
             if isinstance(message, ChatMessage):
+                msg = message.model_dump(mode="json", exclude_none=True)
+            elif (
+                isinstance(message, ChatMessageMCPApprovalResponse)
+                or isinstance(message, DeltaMCPApprovalRequestMessage)
+            ):
                 msg = message.model_dump(mode="json", exclude_none=True)
             else:
                 msg = message

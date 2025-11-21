@@ -72,6 +72,11 @@ class ShuttleAI(ClientBase):
 
     def _check_response_status_codes(self, response: Response) -> None:
         if response.status_code in {429, 500, 502, 503, 504}:
+            try:
+                if response.stream:
+                    response.read()
+            except Exception:
+                pass
             raise ShuttleAIAPIStatusException.from_response(
                 response,
                 message=response.text,
