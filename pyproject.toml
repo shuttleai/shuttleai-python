@@ -1,23 +1,73 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
 [project]
 name = "shuttleai"
-dynamic = [ "version" ]
-
-[tool.poetry]
-name = "shuttleai"
-version = "0.0.0"
+dynamic = ["version"]
 description = "Access Shuttle AI's API via an easy-to-use Python wrapper. Dashboard: https://shuttleai.com Discord: https://discord.gg/shuttleai"
-authors = ["Tristan Liu <tristan@shuttleai.app>", "Christian \"Thoth\" Heru <chris@shuttleai.app>"]
-maintainers = ["Christian \"Thoth\" Heru <chris@shuttleai.app>"]
-homepage = "https://github.com/shuttleai"
-repository = "https://github.com/shuttleai/shuttleai-python"
-urls = { Documentation = "https://docs.shuttleai.com", Dashboard = "https://shuttleai.com", Discord = "https://discord.gg/shuttleai", PyPI = "https://pypi.org/project/shuttleai" }
+authors = [
+    { name = "Tristan Liu", email = "tristan@shuttleai.app" },
+    { name = 'Christian "Thoth" Heru', email = "chris@shuttleai.app" },
+]
+requires-python = ">=3.9,<4"
 readme = "README.md"
+maintainers = [{ name = 'Christian "Thoth" Heru', email = "chris@shuttleai.app" }]
+keywords = [
+    "shuttleai",
+    "ai",
+    "gpt",
+    "claude",
+    "api",
+    "free",
+    "chatgpt",
+    "gpt-4",
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-keywords = ["shuttleai", "ai", "gpt", "claude", "api", "free", "chatgpt", "gpt-4"]
+dependencies = [
+    "requests>=2.32.4,<3",
+    "aiohttp>=3.9.5,<4",
+    "orjson>=3.10.3,<4",
+    "pydantic>=2.7.3,<3",
+    "httpx>= 0.28.1, < 1",
+    "python-dateutil>=2.9.0.post0,<3",
+    "pyreadline3>=3.4.1,<4",
+    "aiofiles>=25.0.0,<26",
+    "types-aiofiles>=25.1.0.20251011,<26",
+    "hatchling>=1.27.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/shuttleai"
+Repository = "https://github.com/shuttleai/shuttleai-python"
+Documentation = "https://docs.shuttleai.com"
+Dashboard = "https://shuttleai.com"
+Discord = "https://discord.gg/shuttleai"
+PyPI = "https://pypi.org/project/shuttleai"
+
+[project.scripts]
+shuttleai = "shuttleai.cli.__main__:main"
+clean = "etc.tools.clean:clean_all"
+key = "etc.tools.key:show_key"
+contr = "etc.tools.contributors:main"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.5,<0.15",
+    "mypy>=1.10.0,<2",
+    "black>=25.11.0,<26",
+    "types-requests>=2.32.4.20250913,<3",
+    "pyyaml>=6.0.1,<7",
+    "types-pyyaml>=6.0.12.20240311,<7",
+    "hatch>=1.15.1",
+]
+
+[tool.hatch.version]
+path = "shuttleai/__init__.py"
 
 [tool.ruff]
 select = ["E", "F", "W", "Q", "I"]
@@ -52,40 +102,3 @@ no_implicit_optional = true
 warn_return_any = true
 warn_unused_ignores = true
 exclude = ["docs", "tests", "examples", "tools", "build", "etc"]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-aiohttp = "^3.9.5"
-orjson = "^3.10.3"
-pydantic = "^2.7.3"
-httpx = ">= 0.28.1, < 1"
-python-dateutil = "^2.9.0.post0"
-matplotlib = "^3.9.0"
-pyreadline3 = "^3.4.1"
-aiofiles = "^25.0.0"
-types-aiofiles = "^25.1.0.20251011"
-poetry-dynamic-versioning = "^1.4.0"
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.14.5"
-mypy = "^1.10.0"
-black = "^25.11.0"
-types-requests = "^2.32.4.20250913"
-pyyaml = "^6.0.1"
-types-pyyaml = "^6.0.12.20240311"
-
-[tool.poetry.scripts]
-shuttleai = "shuttleai.cli.__main__:main"
-clean = "etc.tools.clean:clean_all"
-key = "etc.tools.key:show_key"
-contr = "etc.tools.contributors:main"
-
-[tool.poetry.requires-plugins]
-poetry-dynamic-versioning = { version = "^1.3.0", extras = ["plugin"] }
-
-[tool.poetry-dynamic-versioning]
-enable = true
-
-[build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
-build-backend = "poetry_dynamic_versioning.backend"
