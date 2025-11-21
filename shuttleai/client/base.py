@@ -11,8 +11,8 @@ from shuttleai.exceptions import ShuttleAIException
 from shuttleai.schemas.chat.completions import (
     ChatMessage,
     ChatMessageMCPApprovalResponse,
-    DeltaMCPApprovalRequestMessage,
     ChatNamedToolChoice,
+    DeltaMCPApprovalRequestMessage,
     FunctionTool,
     MCPTool,
     ResponseFormat,
